@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Tracker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            background-image: url('https://i.pinimg.com/564x/60/ee/65/60ee651c35897acfc77e7cb33ac5b996.jpg');
+        }
+
+        .investment-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select,
+        button {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .investment-history {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4caf50;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="investment-container">
+        <h2>Investment Tracker</h2>
+
+        <form id="investmentForm">
+
+            <div>
+                <label for="investmentType">Investment Type:</label>
+                <select id="investmentType" name="investmentType">
+                    <option value="stocks">Stocks</option>
+                    <option value="bonds">Bonds</option>
+                    <option value="realEstate">Real Estate</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="investmentAmount">Investment Amount:</label>
+                <input type="number" id="investmentAmount" name="investmentAmount"
+                    placeholder="Enter investment amount">
+            </div>
+
+            <div>
+                <label for="investmentDate">Investment Date:</label>
+                <input type="date" id="investmentDate" name="investmentDate">
+            </div>
+
+            <button type="button" onclick="recordInvestment()">Record Investment</button>
+        </form>
+        </form>
+        <div class="investment-history">
+            <h3>Investment History</h3>
+            <table id="investmentTable">
+                <thead>
+                    <tr>
+                        <th>Investment Type</th>
+                        <th>Amount (INR)</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="investmentList"></tbody>
+            </table>
+        </div>
+
+        <script>
+            function recordInvestment() {
+                var form = document.getElementById('investmentForm');
+                var formData = new FormData(form);
+
+                var investmentType = formData.get('investmentType');
+                var investmentAmount = parseFloat(formData.get('investmentAmount'));
+                var investmentDate = formData.get('investmentDate');
+
+                if (isNaN(investmentAmount) || investmentAmount <= 0) {
+                    alert('Please enter a valid investment amount.');
+                    return;
+                }
+
+                var investmentList = document.getElementById('investmentList');
+                var newRow = investmentList.insertRow();
+
+                var cell1 = newRow.insertCell(0);
+                var cell2 = newRow.insertCell(1);
+                var cell3 = newRow.insertCell(2);
+
+                cell1.textContent = investmentType.charAt(0).toUpperCase() + investmentType.slice(1);
+                cell2.textContent = `$${investmentAmount.toFixed(2)}`;
+                cell3.textContent = investmentDate;
+
+                // Use fetch to send data to the PHP script with the POST method
+                fetch('Investment.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Show the result from the PHP script
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+                // Clear the form after recording the investment
+                form.reset();
+            }
+        </script>
+    </div>
+</body>
+
+</html>

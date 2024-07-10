@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Tracker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            background-image: url('https://i.pinimg.com/564x/84/43/20/844320f2bf011f8dc9a7e797e07c57c4.jpg');
+        }
+
+        .tax-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        input,
+        select,
+        button {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .tax-history {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4caf50;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tax-container">
+        <h2>Tax Tracker</h2>
+
+        <!-- Modify the form to include the action and method attributes -->
+        <form id="taxForm" action="Tax.php" method="post">
+
+            <div class="form-group">
+                <label for="taxType">Tax Type:</label>
+                <select id="taxType" name="taxType">
+                    <option value="incomeTax">Income Tax</option>
+                    <option value="propertyTax">Property Tax</option>
+                    <option value="salesTax">Sales Tax</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="taxAmount">Tax Amount:</label>
+                <input type="number" id="taxAmount" name="taxAmount" placeholder="Enter tax amount">
+            </div>
+
+            <div class="form-group">
+                <label for="taxDeadline">Tax Deadline:</label>
+                <input type="date" id="taxDeadline" name="taxDeadline">
+            </div>
+
+            <!-- Change the button type to submit -->
+            <button type="submit">Record Tax</button>
+        </form>
+
+
+    </div>
+</body>
+
+</html>

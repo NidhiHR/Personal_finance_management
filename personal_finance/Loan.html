@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Calculator</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #287bff;
+            background-image: url('https://i.pinimg.com/564x/4b/4b/1c/4b4b1c35c601ce4b90c2b19208439c30.jpg');
+        }
+
+        .calculator-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .results {
+            margin-top: 20px;
+        }
+
+        .loan-details {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator-container">
+        <h2>Loan Calculator</h2>
+
+        <form id="loanForm">
+            <label for="loanAmount">Loan Amount:</label>
+            <input type="number" id="loanAmount" name="loanAmount" placeholder="Enter loan amount">
+
+            <label for="interestRate">Annual Interest Rate (%):</label>
+            <input type="number" id="interestRate" name="interestRate" placeholder="Enter annual interest rate">
+
+            <label for="loanTerm">Loan Term (years):</label>
+            <input type="number" id="loanTerm" name="loanTerm" placeholder="Enter loan term in years">
+
+            <button type="button" onclick="calculateLoan()">Calculate</button>
+        </form>
+
+
+        <div class="results">
+            <h3>Results</h3>
+            <p id="monthlyPayment">Monthly Payment: ₹0.00</p>
+            <p id="totalPayment">Total Payment: ₹0.00</p>
+            <p id="totalInterest">Total Interest: ₹0.00</p>
+        </div>
+
+        <div class="loan-details">
+            <h3>Loan Details</h3>
+            <table id="loanDetailsTable">
+                <thead>
+                    <tr>
+                        <th>Loan Amount</th>
+                        <th>Annual Interest Rate</th>
+                        <th>Loan Term (years)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="loanDetailsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function calculateLoan() {
+            var loanAmount = parseFloat(document.getElementById('loanAmount').value);
+            var interestRate = parseFloat(document.getElementById('interestRate').value);
+            var loanTerm = parseInt(document.getElementById('loanTerm').value);
+
+            var monthlyPayment = (loanAmount * interestRate / 100 / 12) / (1 - Math.pow(1 + interestRate / 100 / 12, -loanTerm * 12));
+            var totalPayment = monthlyPayment * loanTerm * 12;
+            var totalInterest = totalPayment - loanAmount;
+
+            document.getElementById('monthlyPayment').innerText = 'Monthly Payment: ₹' + monthlyPayment.toFixed(2);
+            document.getElementById('totalPayment').innerText = 'Total Payment: ₹' + totalPayment.toFixed(2);
+            document.getElementById('totalInterest').innerText = 'Total Interest: ₹' + totalInterest.toFixed(2);
+
+            // Add or update loan details in the table
+            addOrUpdateLoanDetails(loanAmount, interestRate, loanTerm);
+
+            // Use fetch to send data to the PHP script with the POST method
+            fetch('Loan.php', {
+                method: 'POST',
+                body: new URLSearchParams(new FormData(document.getElementById('loanForm')))
+            })
+                .then(response => response.text())
+                .then(result => {
+                    alert(result); // Show the result from the PHP script
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function addOrUpdateLoanDetails(loanAmount, interestRate, loanTerm) {
+            const tableBody = document.getElementById('loanDetailsBody');
+            let loanIndex = -1;
+
+            // Check if the loan details already exist in the table
+            Array.from(tableBody.rows).forEach((row, index) => {
+                const amountCell = row.cells[0];
+                const rateCell = row.cells[1];
+                const termCell = row.cells[2];
+
+                if (
+                    parseFloat(amountCell.textContent.replace('₹', '')) === loanAmount &&
+                    parseFloat(rateCell.textContent.replace('%', '')) === interestRate &&
+                    parseInt(termCell.textContent) === loanTerm
+                ) {
+                    loanIndex = index;
+                }
+            });
+
+            if (loanIndex !== -1) {
+                // Update existing loan details
+                const row = tableBody.rows[loanIndex];
+                row.cells[0].textContent = '₹' + loanAmount.toFixed(2);
+                row.cells[1].textContent = interestRate.toFixed(2) + '%';
+                row.cells[2].textContent = loanTerm;
+            } else {
+                // Add new loan details to the table
+                const newRow = tableBody.insertRow();
+
+                const cell1 = newRow.insertCell(0);
+                const cell2 = newRow.insertCell(1);
+                const cell3 = newRow.insertCell(2);
+                const cell4 = newRow.insertCell(3);
+
+                cell1.textContent = '₹' + loanAmount.toFixed(2);
+                cell2.textContent = interestRate.toFixed(2) + '%';
+                cell3.textContent = loanTerm;
+
+                const updateButton = document.createElement('button');
+                updateButton.textContent = 'Update';
+                updateButton.onclick = function () {
+                    updateLoanDetails(newRow.rowIndex - 1);
+                };
+                cell4.appendChild(updateButton);
+
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'Remove';
+                removeButton.onclick = function () {
+                    removeLoanDetails(newRow.rowIndex - 1);
+                };
+                cell4.appendChild(removeButton);
+            }
+        }
+
+        function updateLoanDetails(index) {
+            const loanAmount = parseFloat(prompt('Enter the new loan amount:'));
+            const interestRate = parseFloat(prompt('Enter the new annual interest rate:'));
+            const loanTerm = parseInt(prompt('Enter the new loan term in years:'));
+
+            if (!isNaN(loanAmount) && !isNaN(interestRate) && !isNaN(loanTerm)) {
+                const tableBody = document.getElementById('loanDetailsBody');
+                const rows = tableBody.getElementsByTagName('tr');
+                const selectedRow = rows[index];
+
+                selectedRow.cells[0].textContent = '₹' + loanAmount.toFixed(2);
+                selectedRow.cells[1].textContent = interestRate.toFixed(2) + '%';
+                selectedRow.cells[2].textContent = loanTerm;
+            } else {
+                alert('Please enter valid loan details.');
+            }
+        }
+
+        function removeLoanDetails(index) {
+            const tableBody = document.getElementById('loanDetailsBody');
+            const rows = tableBody.getElementsByTagName('tr');
+            const selectedRow = rows[index];
+            tableBody.removeChild(selectedRow);
+        }
+    </script>
+</body>
+
+</html>

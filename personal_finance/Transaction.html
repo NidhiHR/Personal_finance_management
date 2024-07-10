@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            background-image: url('https://i.pinimg.com/564x/86/a7/4b/86a74b951543653e9c05ade7d4a914f5.jpg');
+        }
+
+        header {
+            background-color: #287bff;
+            color: #fff;
+            text-align: center;
+            padding: 1em 0;
+        }
+
+        #transaction-form {
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        #transaction-table {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+    </style>
+    <title>Personal Finance Management - Transactions</title>
+</head>
+
+<body>
+    <header>
+        <h1>Transactions Page</h1>
+    </header>
+    <section id="transaction-form">
+        <label for="description">Transaction Description:</label>
+        <input type="text" id="description" placeholder="Enter a transaction description">
+
+        <label for="amount">Amount (INR):</label>
+        <input type="number" id="amount" placeholder="Enter the amount">
+
+        <label for="transaction-type">Transaction Type:</label>
+        <select id="transaction-type">
+            <option value="bank transfer">Bank transfer</option>
+            <option value="cash">Cash</option>
+            <option value="gpay">Gpay</option>
+            <option value="credit card">Credit card</option>
+        </select>
+
+        <label for="transaction-date">Transaction Date:</label>
+        <input type="date" id="transaction-date">
+
+        <button onclick="addTransaction()">Add Transaction</button>
+    </section>
+
+    <section id="transaction-table">
+        <h2>Your Transactions List:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Amount (INR)</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="list"></tbody>
+        </table>
+    </section>
+
+    <script>
+        function addTransaction() {
+            const description = document.getElementById('description').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const transactionType = document.getElementById('transaction-type').value;
+            const transactionDate = document.getElementById('transaction-date').value;
+
+            if (description.trim() !== '' && !isNaN(amount) && transactionType && transactionDate) {
+                const tableBody = document.getElementById('list');
+                const newRow = tableBody.insertRow();
+
+                const cell1 = newRow.insertCell(0);
+                const cell2 = newRow.insertCell(1);
+                const cell3 = newRow.insertCell(2);
+                const cell4 = newRow.insertCell(3);
+                const cell5 = newRow.insertCell(4);
+
+                cell1.textContent = description;
+                cell2.textContent = `₹${amount.toLocaleString('en-IN')}`;
+                cell3.textContent = transactionType.charAt(0).toUpperCase() + transactionType.slice(1);
+                cell4.textContent = transactionDate;
+
+                const updateButton = document.createElement('button');
+                updateButton.textContent = 'Update';
+                updateButton.onclick = function () {
+                    // Prompt user for Tid
+                    const tid = prompt('Enter Transaction ID to update:');
+                    if (tid !== null && tid.trim() !== '' && !isNaN(tid)) {
+                        updateTransaction(tid, newRow.rowIndex - 1);
+                    } else {
+                        alert('Please enter a valid Transaction ID.');
+                    }
+                };
+                cell5.appendChild(updateButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = function () {
+                    removeTransaction(newRow.rowIndex - 1);
+                };
+                cell5.appendChild(deleteButton);
+
+                // Create a FormData object to send data to the PHP script
+                const formData = new FormData();
+                formData.append('description', description);
+                formData.append('amount', amount);
+                formData.append('transaction-type', transactionType);
+                formData.append('transaction-date', transactionDate);
+
+                // Use fetch to send data to the PHP script with the POST method
+                fetch('Transaction.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Show the result from the PHP script
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+                // Clear input fields after adding to the list
+                document.getElementById('description').value = '';
+                document.getElementById('amount').value = '';
+                document.getElementById('transaction-type').value = 'bank transfer';
+                document.getElementById('transaction-date').value = '';
+            } else {
+                alert('Please enter valid transaction details.');
+            }
+        }
+
+        function updateTransaction(tid, index) {
+            const tableBody = document.getElementById('list');
+            const row = tableBody.rows[index];
+            const description = prompt('Update transaction description:', row.cells[0].textContent);
+            const amount = parseFloat(prompt('Update amount (INR):', row.cells[1].textContent.replace('₹', '').replace(/,/g, '')));
+            const transactionType = prompt('Update transaction type:', row.cells[2].textContent.toLowerCase());
+            const transactionDate = prompt('Update transaction date:', row.cells[3].textContent);
+
+            if (
+                description.trim() !== '' &&
+                !isNaN(amount) &&
+                transactionType &&
+                transactionDate
+            ) {
+                row.cells[0].textContent = description;
+                row.cells[1].textContent = `₹${amount.toLocaleString('en-IN')}`;
+                row.cells[2].textContent = transactionType.charAt(0).toUpperCase() + transactionType.slice(1);
+                row.cells[3].textContent = transactionDate;
+
+                // Create a FormData object to send data to the PHP script
+                const formData = new FormData();
+                formData.append('transaction-id', tid); // Pass Tid to PHP script
+                formData.append('description', description);
+                formData.append('amount', amount);
+                formData.append('transaction-type', transactionType);
+                formData.append('transaction-date', transactionDate);
+
+                // Use fetch to send data to the PHP script with the POST method
+                fetch('TransactionUpdate.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Show the result from the PHP script
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                alert('Please enter valid transaction details.');
+            }
+        }
+        function removeTransaction(index) {
+            // Prompt user for Tid
+            const tid = prompt('Enter Transaction ID to delete:');
+            if (tid !== null && tid.trim() !== '' && !isNaN(tid)) {
+                const tableBody = document.getElementById('list');
+                tableBody.deleteRow(index);
+
+                // Create a FormData object to send data to the PHP script
+                const formData = new FormData();
+                formData.append('transaction-id', tid);
+
+                // Use fetch to send data to the PHP script with the POST method
+                fetch('TransactionDelete.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Show the result from the PHP script
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                alert('Please enter a valid Transaction ID.');
+            }
+        }
+    </script>
+</body>
+
+</html>

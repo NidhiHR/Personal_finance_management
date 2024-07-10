@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            background-image: url('https://i.pinimg.com/564x/86/a7/4b/86a74b951543653e9c05ade7d4a914f5.jpg');
+        }
+
+        header {
+            background-color: #287bff;
+            color: #fff;
+            text-align: center;
+            padding: 1em 0;
+        }
+
+        #account-form {
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        #account-table {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        button.update,
+        button.delete {
+            background-color: #333;
+            color: #fff;
+            padding: 8px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        button.update:hover,
+        button.delete:hover {
+            background-color: #555;
+        }
+    </style>
+    <title>Personal Finance Management - Accounts</title>
+</head>
+
+<body>
+    <header>
+        <h1>Accounts Page</h1>
+    </header>
+    <section id="account-form">
+        <label for="account-number">Account Number:</label>
+        <input type="text" id="account-number" placeholder="Enter the account number">
+
+        <label for="account-type">Account Type:</label>
+        <select id="account-type">
+            <option value="savings">Savings</option>
+            <option value="checking">Checking</option>
+            <option value="credit">Credit</option>
+        </select>
+
+        <label for="current-balance">Current Balance (INR):</label>
+        <input type="number" id="current-balance" placeholder="Enter the current balance">
+
+        <button onclick="addAccount()">Add Account</button>
+    </section>
+
+    <section id="account-table">
+        <h2>Your Accounts List:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Account Number</th>
+                    <th>Account Type</th>
+                    <th>Current Balance (INR)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="list"></tbody>
+        </table>
+    </section>
+
+    <script>
+
+        function addAccount() {
+            const accountNumber = document.getElementById('account-number').value;
+            const accountType = document.getElementById('account-type').value;
+            const currentBalance = parseFloat(document.getElementById('current-balance').value);
+
+            if (accountNumber.trim() !== '' && accountType && !isNaN(currentBalance)) {
+                const tableBody = document.getElementById('list');
+                const newRow = tableBody.insertRow();
+
+                const cell1 = newRow.insertCell(0);
+                const cell2 = newRow.insertCell(1);
+                const cell3 = newRow.insertCell(2);
+                const cell4 = newRow.insertCell(3);
+
+                cell1.textContent = accountNumber;
+                cell2.textContent = accountType.charAt(0).toUpperCase() + accountType.slice(1);
+                cell3.textContent = `₹${currentBalance.toLocaleString('en-IN')}`;
+
+                const updateButton = document.createElement('button');
+                updateButton.textContent = 'Update';
+                updateButton.onclick = function () {
+                    updateAccount(newRow.rowIndex - 1);
+                };
+                cell4.appendChild(updateButton);
+
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'Remove';
+                removeButton.onclick = function () {
+                    deleteAccount(newRow.rowIndex - 1);
+                };
+                cell4.appendChild(removeButton);
+
+
+                // Use fetch to send data to the PHP script with the POST method
+                fetch('Account.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        'action': 'add',
+                        'accountNumber': accountNumber,
+                        'accountType': accountType,
+                        'currentBalance': currentBalance
+                    }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Show the result from the PHP script
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+                // Clear input fields after adding to the list
+                document.getElementById('account-number').value = '';
+                document.getElementById('account-type').value = 'savings';
+                document.getElementById('current-balance').value = '';
+            } else {
+                alert('Please enter valid account details.');
+            }
+        }
+
+        function updateAccount(index) {
+            const accId = prompt('Enter the Account ID to update:');
+            if (accId !== null && accId.trim() !== '' && !isNaN(accId)) {
+                const newAccountNumber = prompt('Enter the new Account Number:');
+                const newAccountType = prompt('Enter the new Account Type:');
+                const newCurrentBalance = prompt('Enter the new Current Balance:');
+
+                // Use fetch to send data to the PHP script with the POST method
+                fetch('AccountUpdate.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        'action': 'update',
+                        'accId': accId,
+                        'newAccountNumber': newAccountNumber,
+                        'newAccountType': newAccountType,
+                        'newCurrentBalance': newCurrentBalance
+                    }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Show the result from the PHP script
+                        // Optionally, update the UI based on the server response
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                alert('Please enter a valid Account ID.');
+            }
+        }
+
+        function deleteAccount(index) {
+            const accId = prompt('Enter the Account ID to delete:');
+            if (accId !== null && accId.trim() !== '' && !isNaN(accId)) {
+                // Use fetch to send data to the PHP script with the POST method
+                fetch('AccountDelete.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        'action': 'delete',
+                        'accId': accId
+                    }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Show the result from the PHP script
+                        // Optionally, update the UI based on the server response
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                alert('Please enter a valid Account ID.');
+            }
+        }
+    </script>
+</body>
+
+</html>

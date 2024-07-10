@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            background-image: url("https://i.pinimg.com/564x/25/f3/79/25f3792bb151520d1ae87926e8e6633a.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        label {
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        .error {
+            color: red;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <title>Account Creation</title>
+</head>
+
+<body>
+
+    <h1>Login</h1>
+
+    <form id="loginForm" onsubmit="authenticateUser(event)">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <span id="loginError" class="error"></span>
+        <br>
+
+        <button type="submit">Log In</button>
+    </form>
+
+
+    <script>
+        function authenticateUser(event) {
+            event.preventDefault();
+
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            // Check if the entered username and password match the predefined values
+            if (username === "PersonalFinance" && password === "123456") {
+                // Authentication successful, redirect or perform other actions
+                alert("Login successful!");
+                // For demonstration purposes, just display an alert; in a real system, you would redirect to another page.
+                window.location.href = "Dashboardfinal.html";
+            } else {
+                // Display error message for incorrect credentials
+                document.getElementById("loginError").innerText = "Invalid username or password";
+            }
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Tracker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            background-image: url('https://png.pngtree.com/thumb_back/fw800/background/20220511/pngtree-aesthetic-an-insurance-theme-featuring-a-house-and-palm-tree-against-a-torn-paper-backdrop-photo-image_24433798.jpg');
+            background-position: center;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .insurance-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        input,
+        select,
+        button {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .insurance-history {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4caf50;
+            color: #fff;
+        }
+
+        button.edit-btn,
+        button.delete-btn {
+            /* Additional styling for buttons */
+            background-color: #007bff;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        button.delete-btn {
+            /* Additional styling for delete button */
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="insurance-container">
+        <h2>Insurance Tracker</h2>
+
+        <div class="form-group">
+            <label for="insuranceType">Insurance Type:</label>
+            <select id="insuranceType">
+                <option value="life">Life Insurance</option>
+                <option value="health">Health Insurance</option>
+                <option value="auto">Auto Insurance</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="insurancePremium">Insurance Premium:</label>
+            <input type="number" id="insurancePremium" placeholder="Enter insurance premium">
+        </div>
+
+        <div class="form-group">
+            <label for="insuranceRenewal">Renewal Date:</label>
+            <input type="date" id="insuranceRenewal">
+        </div>
+
+        <button onclick="recordInsurance()">Record Insurance</button>
+
+        <div class="insurance-history">
+            <h3>Insurance History</h3>
+            <table id="insuranceTable">
+                <thead>
+                    <tr>
+                        <th>Insurance Type</th>
+                        <th>Insurance Premium</th>
+                        <th>Renewal Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="insuranceList"></tbody>
+            </table>
+        </div>
+
+        <script>
+            function recordInsurance() {
+                var insuranceType = document.getElementById('insuranceType').value;
+                var insurancePremium = parseFloat(document.getElementById('insurancePremium').value);
+                var insuranceRenewal = document.getElementById('insuranceRenewal').value;
+
+                if (isNaN(insurancePremium) || insurancePremium <= 0) {
+                    alert('Please enter a valid insurance premium.');
+                    return;
+                }
+
+                // Use fetch to send data to the PHP script with the POST method
+                fetch('Insurance.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        'action': 'add',
+                        'insuranceType': insuranceType,
+                        'insurancePremium': insurancePremium,
+                        'insuranceRenewal': insuranceRenewal
+                    }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Show the result from the PHP script
+                        loadInsuranceData(); // Reload the insurance data after recording
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+
+            function editInsurance(button) {
+                var row = button.parentNode.parentNode;
+                var insuranceId = prompt('Enter Insurance ID (Iid) to update:');
+                var newInsuranceType = prompt('Edit Insurance Type:', row.cells[0].textContent);
+                var newInsurancePremium = prompt('Edit Insurance Premium:', row.cells[1].textContent.match(/\d+\.\d+/)[0]);
+                var newInsuranceRenewal = prompt('Edit Renewal Date:', row.cells[2].textContent);
+
+                if (isNaN(insuranceId) || isNaN(newInsurancePremium) || newInsurancePremium <= 0) {
+                    alert('Please enter valid details.');
+                    return;
+                }
+
+                // Use fetch to send data to the PHP script with the POST method
+                fetch('InsuranceUpdate.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        'action': 'update',
+                        'insuranceId': insuranceId,
+                        'newInsuranceType': newInsuranceType,
+                        'newInsurancePremium': newInsurancePremium,
+                        'newInsuranceRenewal': newInsuranceRenewal
+                    }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Show the result from the PHP script
+                        loadInsuranceData(); // Reload the insurance data after updating
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+
+            function deleteInsurance(button) {
+                var row = button.parentNode.parentNode;
+                var insuranceId = prompt('Enter Insurance ID (Iid) to delete:');
+
+                if (isNaN(insuranceId)) {
+                    alert('Please enter a valid Insurance ID.');
+                    return;
+                }
+
+                // Use fetch to send data to the PHP script with the POST method
+                fetch('InsuranceDelete.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        'action': 'delete',
+                        'insuranceId': insuranceId
+                    }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Show the result from the PHP script
+                        loadInsuranceData(); // Reload the insurance data after deletion
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+
+            function loadInsuranceData() {
+                // Use fetch to get data from the PHP script with the GET method
+                fetch('InsuranceGetData.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Update the insuranceList tbody with the retrieved data
+                        var insuranceList = document.getElementById('insuranceList');
+                        insuranceList.innerHTML = '';
+                        data.forEach(row => {
+                            var newRow = insuranceList.insertRow();
+                            newRow.insertCell(0).textContent = row.insurance_type;
+                            newRow.insertCell(1).textContent = `₹${row.insurance_premium.toLocaleString('en-IN')}`;
+                            newRow.insertCell(2).textContent = row.renewal_date;
+                            var cell4 = newRow.insertCell(3);
+                            cell4.innerHTML = `<button class="edit-btn" onclick="editInsurance(this)">Edit</button>
+                                           <button class="delete-btn" onclick="deleteInsurance(this)">Delete</button>`;
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+
+            // Initial load of insurance data when the page is loaded
+            loadInsuranceData();
+        </script>
+    </div>
+</body>
+
+</html>

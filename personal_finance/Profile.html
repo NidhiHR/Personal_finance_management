@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-image: url('https://img.freepik.com/premium-photo/finance-report-graph-with-coin-illustration_180947-704.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 500px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            display: grid;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            /* Add margin for spacing */
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <title>User Profile</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>User Profile</h1>
+        <form id="profileForm">
+            <!-- Add a hidden input field for userid -->
+            <input type="hidden" id="userid" name="userid">
+
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" required>
+
+            <label for="useraddress">Address:</label>
+            <input type="text" id="useraddress" name="useraddress" required>
+
+            <label for="pincode">Pincode:</label>
+            <input type="number" id="pincode" name="pincode" required>
+
+            <label for="phone">Phone:</label>
+            <input type="tel" id="phone" name="phone" required>
+
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender" required>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+            </select>
+
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" required>
+
+            <button type="button" onclick="saveProfile()">Save</button>
+        </form>
+    </div>
+
+    <script>
+        function saveProfile() {
+            // Gather form data
+            var userid = document.getElementById('userid').value;
+            var username = document.getElementById('username').value;
+            var dob = document.getElementById('dob').value;
+            var useraddress = document.getElementById('useraddress').value;
+            var pincode = document.getElementById('pincode').value;
+            var phone = document.getElementById('phone').value;
+            var gender = document.getElementById('gender').value;
+            var age = document.getElementById('age').value;
+
+            // Create a FormData object
+            var formData = new FormData();
+            formData.append('userid', userid);
+            formData.append('username', username);
+            formData.append('dob', dob);
+            formData.append('useraddress', useraddress);
+            formData.append('pincode', pincode);
+            formData.append('phone', phone);
+            formData.append('gender', gender);
+            formData.append('age', age);
+
+            // Create and send an AJAX request
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'Profile.php', true);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert('Profile saved successfully');
+                } else {
+                    alert('Error saving profile');
+                }
+            };
+
+            xhr.send(formData);
+        }
+    </script>
+</body>
+
+</html>

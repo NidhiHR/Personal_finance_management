@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            background-image: url('https://i.pinimg.com/564x/6f/5c/ef/6f5cef3c7b89c3d1990b74924c9dc4d3.jpg');
+        }
+
+        header {
+            background-color: #287bff;
+            color: #fff;
+            text-align: center;
+            padding: 1em 0;
+        }
+
+        #goals-form {
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        #goals-table {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+    </style>
+    <title>Personal Finance Management - Goals</title>
+</head>
+
+<body>
+    <header>
+        <h1>Goals Page</h1>
+    </header>
+    <section id="goals-form">
+
+        <label for="goal-description">Goal Description:</label>
+        <input type="text" id="goal-description" placeholder="Enter a goal description">
+
+        <label for="target-amount">Target Amount (INR):</label>
+        <input type="number" id="target-amount" placeholder="Enter the target amount">
+
+        <label for="current-amount">Current Amount (INR):</label>
+        <input type="number" id="current-amount" placeholder="Enter the current amount">
+
+        <button onclick="addGoal()">Add Goal</button>
+
+    </section>
+
+    <section id="goals-table">
+        <h2>Your Goals List:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Target Amount (INR)</th>
+                    <th>Current Amount (INR)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="list"></tbody>
+        </table>
+    </section>
+
+    <script>
+        function addGoal() {
+            const goalDescription = document.getElementById('goal-description').value;
+            const targetAmount = parseFloat(document.getElementById('target-amount').value);
+            const currentAmount = parseFloat(document.getElementById('current-amount').value);
+
+            if (goalDescription.trim() !== '' && !isNaN(targetAmount) && !isNaN(currentAmount)) {
+                const tableBody = document.getElementById('list');
+                const newRow = tableBody.insertRow();
+
+                const cell1 = newRow.insertCell(0);
+                const cell2 = newRow.insertCell(1);
+                const cell3 = newRow.insertCell(2);
+                const cell4 = newRow.insertCell(3);
+
+                cell1.textContent = goalDescription;
+                cell2.textContent = `₹${targetAmount.toLocaleString('en-IN')}`;
+                cell3.textContent = `₹${currentAmount.toLocaleString('en-IN')}`;
+
+                const updateButton = document.createElement('button');
+                updateButton.textContent = 'Update';
+                updateButton.onclick = function () {
+                    updateGoal(newRow.rowIndex - 1);
+                };
+                cell4.appendChild(updateButton);
+
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'Remove';
+                removeButton.onclick = function () {
+                    removeGoal(newRow.rowIndex - 1);
+                };
+                cell4.appendChild(removeButton);
+
+                // Use fetch to send data to the PHP script with the POST method
+                fetch('Goal.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        'action': 'add',
+                        'goalDescription': goalDescription,
+                        'targetAmount': targetAmount,
+                        'currentAmount': currentAmount
+                    }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Show the result from the PHP script
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+                // Clear input fields after adding to the list
+                document.getElementById('goal-description').value = '';
+                document.getElementById('target-amount').value = '';
+                document.getElementById('current-amount').value = '';
+            } else {
+                alert('Please enter valid goal details.');
+            }
+        }
+
+        function updateGoal(index) {
+            const gid = prompt('Enter Goal ID (Gid) to update:');
+            const goalDescription = prompt('Enter the new goal description:');
+            const targetAmount = parseFloat(prompt('Enter the new target amount (INR):'));
+            const currentAmount = parseFloat(prompt('Enter the new current amount (INR):'));
+
+            if (!isNaN(gid) && goalDescription.trim() !== '' && !isNaN(targetAmount) && !isNaN(currentAmount)) {
+                const tableBody = document.getElementById('list');
+                const rows = tableBody.getElementsByTagName('tr');
+                const selectedRow = rows[index];
+
+                selectedRow.cells[0].textContent = goalDescription;
+                selectedRow.cells[1].textContent = `₹${targetAmount.toLocaleString('en-IN')}`;
+                selectedRow.cells[2].textContent = `₹${currentAmount.toLocaleString('en-IN')}`;
+
+                // Use fetch to send data to the PHP script with the POST method
+                fetch('GoalUpdate.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        'action': 'update',
+                        'gid': gid,
+                        'newGoalDescription': goalDescription,
+                        'newTargetAmount': targetAmount,
+                        'newCurrentAmount': currentAmount
+                    }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Show the result from the PHP script
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                alert('Please enter valid details.');
+            }
+        }
+
+        function removeGoal(index) {
+            const gid = prompt('Enter Goal ID (Gid) to delete:');
+            if (!isNaN(gid)) {
+                const tableBody = document.getElementById('list');
+                const rows = tableBody.getElementsByTagName('tr');
+                const selectedRow = rows[index];
+                tableBody.removeChild(selectedRow);
+
+                // Use fetch to send data to the PHP script with the POST method
+                fetch('GoalDelete.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        'action': 'delete',
+                        'gid': gid
+                    }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result); // Show the result from the PHP script
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                alert('Please enter a valid Goal ID.');
+            }
+        }
+    </script>
+</body>
+
+</html>

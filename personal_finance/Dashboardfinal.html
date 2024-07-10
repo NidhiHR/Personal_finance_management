@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <title>DASHBOARD</title>
+    <link rel="stylesheet" type="text/css " href="style.css">
+</head>
+
+<body
+    style="background-image: url('https://i.pinimg.com/564x/a6/31/76/a63176ffc0967d6f336a4c578adb82e8.jpg');background-repeat: no-repeat;background-size: cover">
+    <div class="container">
+        <div class="navigation active">
+            <ul>
+                <li>
+                    <a href="#">
+                        <span class="icon"></ion-icon></span>
+
+                        <span class="title">FINANCE</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="Profile.html">
+                        <span class="icon"><ion-icon name="person-outline"></ion-icon></span>
+
+                        <span class="title">Profile</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="Account.html">
+                        <span class="icon"><ion-icon name="card-sharp"></ion-icon></span>
+                        <span class="title">Account</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="Transaction.html ">
+                        <span class="icon"><ion-icon name="list-sharp"></ion-icon></span>
+                        <span class="title">Transaction</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="Budget.html">
+                        <span class="icon"><ion-icon name="wallet-sharp"></ion-icon></span>
+                        <span class="title">Budget</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="Goal.html">
+                        <span class="icon"><ion-icon name="flag-sharp"></ion-icon></span>
+                        <span class="title">Goals</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="Loan.html">
+                        <span class="icon"><ion-icon name="cash-sharp"></ion-icon></span>
+                        <span class="title">Loan</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="Insurance.html ">
+                        <span class="icon"><ion-icon name="shield-checkmark-sharp"></ion-icon></span>
+                        <span class="title">Insurance</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="Investment.html">
+                        <span class="icon"><ion-icon name="analytics-sharp"></ion-icon></span>
+                        <span class="title">Investment</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="Tax.html">
+                        <span class="icon"><ion-icon name="document-text-sharp"></ion-icon></span>
+                        <span class="title">Tax</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="logout-btn">
+                        <span class="icon"><ion-icon name="log-out-sharp"></ion-icon></span>
+                        <span class="title">Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="main active">
+            <!--<div class="topbar">-->
+            <div class="toggle">
+                <ion-icon name="menu-outline"></ion-icon>
+                <!--</div>-->
+            </div>
+
+
+            <!--
+    <div class="cardbox">
+        <div class="card">
+            <div>
+            <div class="numbers">1,504</div>
+            <div class="cardname">Transaction</div>
+            </div>
+        <div class="iconbx">
+            <ion-icon name="cash-outline"></ion-icon>
+        </div>
+        </div>
+    </div>
+
+     <div class="cardbox">
+         <div class="card">
+             <div>
+                 <div class="numbers">1,504</div>
+                 <div class="cardname">Budget</div>
+             </div>
+             <div class="iconbx">
+                 <ion-icon name="wallet-outline"></ion-icon>
+             </div>
+         </div>
+     </div>
+
+     <div class="cardbox">
+         <div class="card">
+             <div>
+                 <div class="numbers">1,504</div>
+                 <div class="cardname">Goal</div>
+             </div>
+             <div class="iconbx">
+                 <ion-icon name="clipboard-outline"></ion-icon>
+             </div>
+         </div>
+     </div>
+
+     <div class="cardbox">
+         <div class="card">
+             <div>
+                 <div class="numbers">1,504</div>
+                 <div class="cardname">Investment</div>
+             </div>
+             <div class="iconbx">
+                 <ion-icon name="bar-chart-outline"></ion-icon>
+             </div>
+         </div>
+     </div>
+-->
+
+
+        </div>
+        <pre style="font-size: 70px; color:Black"><center>
+        <b>
+        BUDGET BUDDY </b>
+    </center></pre>
+    </div>
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <script>
+
+        let toggle = document.querySelector('.toggle');
+        let navigation = document.querySelector('.navigation');
+        let main = document.querySelector('.main');
+
+        toggle.onclick = function () {
+            navigation.classList.toggle('active');
+            main.classList.toggle('active');
+        };
+
+        let list = document.querySelectorAll('.navigation li');
+
+        function activelink() {
+            list.forEach((item) => {
+                item.classList.remove('hovered');
+                item.classList.add('hovered');
+            });
+        }
+
+        list.forEach((item) => {
+            item.addEventListener('mouseenter', activelink);
+            item.addEventListener('mouseleave', () => {
+                item.classList.remove('hovered');
+            });
+        });
+
+
+        document.getElementById('logout-btn').addEventListener('click', function () {
+            // Redirect to the login page
+            window.location.href = 'login.html'; // Replace 'login.html' with the actual login page URL
+        });
+
+    </script>
+</body>
+
+</html>
